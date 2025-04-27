@@ -1,17 +1,13 @@
 const { chromium } = require('playwright');
+const { login } = require('./login'); // Import reusable login function
 
 (async () => {
-  const browser = await chromium.launch({ headless: false }); // Set headless: true for CI
+  const browser = await chromium.launch({ headless: false });
   const context = await browser.newContext();
   const page = await context.newPage();
 
-  // Navigate to the login page
-  await page.goto('https://www.saucedemo.com/');
-
-  // Login
-  await page.fill('#user-name', 'standard_user');
-  await page.fill('#password', 'secret_sauce');
-  await page.click('#login-button');
+  // Use the reusable login
+  await login(page);
 
   // Wait for the inventory page to load
   await page.waitForSelector('.inventory_list');

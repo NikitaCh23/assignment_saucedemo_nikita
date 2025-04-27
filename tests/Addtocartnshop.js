@@ -1,9 +1,13 @@
 const { chromium } = require('playwright');
+const { login } = require('./login'); // Import reusable login function
 
 (async () => {
   const browser = await chromium.launch({ headless: false });
   const context = await browser.newContext();
   const page = await context.newPage();
+
+  // Use the reusable login
+  await login(page);
 
   // Login page for site
   await page.goto('https://www.saucedemo.com/');

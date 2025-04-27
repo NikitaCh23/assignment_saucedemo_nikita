@@ -1,20 +1,18 @@
 const { chromium } = require('playwright');
+const { login } = require('./login'); // Import reusable login function
 
 (async () => {
   const browser = await chromium.launch({ headless: false });
   const context = await browser.newContext();
   const page = await context.newPage();
 
-  // Step 1: Login
-  await page.goto('https://www.saucedemo.com/');
-  await page.fill('#user-name', 'standard_user');
-  await page.fill('#password', 'secret_sauce');
-  await page.click('#login-button');
+  // Use the reusable login
+  await login(page);
 
-  // Step 2: Wait for inventory page
+  // Wait for inventory page
   await page.waitForSelector('.inventory_list');
 
-  // Step 3: Define specific item names you want to add
+  // Define specific item names you want to add
   const itemsToAdd = [
     'Sauce Labs Backpack',
     'Sauce Labs Bolt T-Shirt'
@@ -29,7 +27,7 @@ const { chromium } = require('playwright');
     await addButton.click();
   }
 
-  // Step 4: Go to cart
+  // Go to cart
   await page.click('.shopping_cart_link');
   await page.waitForTimeout(1000);
 
@@ -47,14 +45,14 @@ const { chromium } = require('playwright');
     console.error('❌ Missing items in cart:', missingItems);
   }
 
-  // Step 5: Proceed to checkout
+  // checkout
   await page.click('#checkout');
   await page.fill('#first-name', 'John');
   await page.fill('#last-name', 'Doe');
   await page.fill('#postal-code', '411001');
   await page.click('#continue');
 
-  // Step 6: Verify items on the overview page
+  // Verify items on the overview page
   const overviewNames = await page.$$eval('.inventory_item_name', items =>
     items.map(i => i.textContent.trim())
   );
@@ -66,7 +64,7 @@ const { chromium } = require('playwright');
     console.error('❌ Mismatch on overview page:', overviewMismatch);
   }
 
-  // Step 7: Finish and confirm
+  // Finish and confirm
   await page.click('#finish');
   const confirmation = await page.locator('.complete-header').textContent();
 
@@ -76,7 +74,7 @@ const { chromium } = require('playwright');
     console.error('❌ Checkout confirmation message not found.');
   }
 
-  // Optional: Pause for inspection
+  // Pause for inspection
   await page.pause();
   // await browser.close();
 })();
